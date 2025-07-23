@@ -665,16 +665,16 @@
         var addr_option = 1;
         var y_name = $('#n-data').val();
         var y_addr = $('#a-data').val();
-        $("#btn-addr").on('click', function(){
-            if(addr_option == 1){
+        $("#btn-addr").on('click', function () {
+            if (addr_option == 1) {
                 $('.nkaddr').html('<input id="nkaddr" type="text" required placeholder="6-15位中文、字母或数字">');
                 $('#nkaddr').focus();
                 $("#btn-addr i").text('提交');
                 addr_option = 0
-            }else{
+            } else {
                 var j_data = {};
                 var v_nkaddr = $('#nkaddr').val();
-                if(5 < v_nkaddr.length < 16){
+                if (5 < v_nkaddr.length < 16) {
                     if (/[\u4e00-\u9fa5|a-zA-Z0-9]+$/.test(v_nkaddr)) {
                         j_data['name'] = v_nkaddr;
                         j_data['y_name'] = y_name
@@ -697,7 +697,7 @@
                             addr_option = 1;
                             $('.nkaddr').html(v_nkaddr);
                             $('#btn-addr i').text('编辑');
-                            $('#a-data').att('value', v_nkaddr);
+                            $('#a-data').attr('value', v_nkaddr);
                         } else {
                             alert('修改失败，请重试~');
                             $('#nkaddr').html(y_addr);
@@ -716,16 +716,16 @@
         var pd_option = 1;
         var y_name = $('#n-data').val();
         var y_pd = $('#p-data').val();
-        $("#btn-pd").on('click', function(){
-            if(pd_option == 1){
+        $("#btn-password").on('click', function () {
+            if (pd_option == 1) {
                 $('.nkpd').html('<input id="nkpd" type="text" required placeholder="6-15位中文、字母或数字">');
                 $('#nkpd').focus();
                 $("#btn-pd i").text('提交');
                 pd_option = 0
-            }else{
+            } else {
                 var j_data = {};
                 var v_nkpd = $('#nkpd').val();
-                if(5 < v_nkpd.length < 16){
+                if (5 < v_nkpd.length < 16) {
                     if (/[a-zA-Z0-9]+$/.test(v_nkpd)) {
                         j_data['pd'] = v_nkpd;
                         j_data['y_name'] = y_name
@@ -748,7 +748,7 @@
                             pd_option = 1;
                             $('.nkpd').html(v_nkpd);
                             $('#btn-pd i').text('编辑');
-                            $('#p-data').att('value', v_nkpd);
+                            $('#p-data').attr('value', v_nkpd);
                         } else {
                             alert('修改失败，请重试~');
                             $('#nkpd').html(y_pd);
@@ -767,17 +767,17 @@
         var email_option = 1;
         var y_name = $('#n-data').val();
         var y_email = $('#e-data').val();
-        $("#btn-email").on('click', function(){
-            if(email_option == 1){
+        $("#btn-email").on('click', function () {
+            if (email_option == 1) {
                 $('.nkemail').html('<input id="nkemail" type="text" required placeholder="邮箱格式错误！">');
                 $('#nkemail').focus();
                 $("#btn-email i").text('提交');
                 email_option = 0
-            }else{
+            } else {
                 var j_data = {};
                 var v_nkemail = $('#nkemail').val();
-                if(5 < v_nkemail.length < 16){
-                    if (v_nkemail.match(/^[a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/)) {
+                if (5 < v_nkemail.length < 16) {
+                    if (/^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/.test(v_nkemail)) {
                         j_data['email'] = v_nkemail;
                         j_data['y_name'] = y_name
                     } else {
@@ -799,7 +799,7 @@
                             email_option = 1;
                             $('.nkemail').html(v_nkemail);
                             $('#btn-email i').text('编辑');
-                            $('#e-data').att('value', v_nkemail);
+                            $('#e-data').attr('value', v_nkemail);
                         } else {
                             alert('修改失败，请重试~');
                             $('#nkemail').html(y_email);
@@ -814,7 +814,7 @@
                 });
             }
         });
-        
+
     </script>
 </body>
 
