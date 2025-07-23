@@ -545,9 +545,30 @@
 
 
         // 退出登录功能
-        $('#logout').on('click', function () {
+        // 为 id="logout" 的按钮绑定点击事件
+        $('#logout').on('click', function (event) {
+            event.preventDefault(); // 阻止任何默认行为
+
             if (confirm("确定要退出登录吗？")) {
-                window.location.href = "/logout";
+                $.ajax({
+                    url: "/logout", // 请求后端的 /logout 接口
+                    type: 'get',
+                    dataType: 'json', // 期望后端返回 JSON 格式的数据
+                    success: function (res) {
+                        // 'res' 就是后端 jsonify 返回的对象
+                        if (res.valid === 1) {
+                            alert(res.msg);
+                            // 退出成功后，刷新页面或跳转到首页
+                            window.location.href = '/';
+                        } else {
+                            alert(res.msg);
+                        }
+                    },
+                    error: function () {
+                        // 如果请求失败，给出提示
+                        alert("操作失败，网络或服务器错误。");
+                    }
+                });
             }
         });
 

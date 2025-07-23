@@ -333,7 +333,7 @@
 
                     {% if request.cookies.get('name') %}
                     <li class="nav-item">
-                        <a class="nav-link" id="logout" href="">退出登录</a>
+                        <a class="nav-link" id="logout" href="javascript:;">退出登录</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -575,7 +575,7 @@
         });
 
         //登出功能
-        $("#logout").on('click', function () {
+        $("#logout").on('click', function (event) {
             $.ajax({
                 url: "/logout",
                 type: 'get',
