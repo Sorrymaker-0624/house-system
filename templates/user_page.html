@@ -410,7 +410,7 @@
 
                         {% for house in collect_house_list %}
                         <div class="row collection-line" id="collect">
-                            <span class="collect_off" id="{{ house.id }}">取消收藏</span>
+                            <button class="btn btn-danger btn-sm collect_off" id="{{ house.id }}">取消收藏</button>
                             <div class="col-lg-4 col-md-4 mx-auto">
                                 <div>
                                     <a href="/house/{{ house.id }}">
@@ -548,30 +548,34 @@
 
         //取消收藏
         $(".collect_off").on('click', function () {
-            var hid = this.id;
-            var name = $.cookie('name');
-            var $span = $(this);
-            if (name) {
-                $.ajax({
-                    url: "/collect_off",
-                    type: 'post',
-                    data: {
-                        house_id: hid,
-                        user_name: name,
-                    },
-                    dataType: 'json',
-                    success: function (resp) {
-                        if (resp["valid"] == '1') {
-                            alert(resp["msg"]);
-                            $span.parent().remove();
-                        } else {
-                            alert(resp["msg"]);
-                        }
+            // 'this' 指向被点击的 button 元素
+            var button = $(this);
+            var houseId = this.id; // 直接从按钮的id获取房源ID
+
+            // 不需要前端的 if 判断了，直接发送请求
+            $.ajax({
+                url: '/collect/' + houseId, // 调用我们统一的收藏/取消收藏接口
+                type: 'POST',
+                dataType: 'json',
+                success: function (resp) {
+                    // 如果后端返回成功，并且操作是“removed”（移除）
+                    if (resp.valid === '1' && resp.action === 'removed') {
+                        alert(resp.msg); // 弹出“已取消收藏”
+
+                        // 使用 .closest('.collection-line') 找到按钮所在的整个房源信息行
+                        // 然后用一个平滑的动画效果将它移除
+                        button.closest('.collection-line').fadeOut(500, function () {
+                            $(this).remove();
+                        });
+                    } else {
+                        // 如果操作失败（比如用户未登录，后端会返回提示），也弹出消息
+                        alert(resp.msg);
                     }
-                })
-            } else {
-                alert('您还没有登录！')
-            }
+                },
+                error: function () {
+                    alert('请求失败，网络或服务器错误！');
+                }
+            });
         });
 
         //登出功能

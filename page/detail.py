@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template ,request
 
-from models import House
+from models import House,User
 
 detail_page = Blueprint('detail_page', __name__)
 
@@ -21,9 +21,26 @@ def detail(hid):
         recommend_li = recommend_data[:6]
     else:
         recommend_li = recommend_data
+    is_collected = False    
+    user_name = request.cookies.get('name') # b. 获取当前登录的用户名
+    
+    if user_name: # c. 如果用户已登录
+        user = User.query.filter_by(name=user_name).first()
+        if user and user.collect_id:
+            collect_ids = user.collect_id.split(',')
+            # d. 检查当前房源ID是否在用户的收藏列表里
+            if str(hid) in collect_ids:
+                is_collected = True # e. 如果在，就将状态设置为“已收藏”
+    #
+    # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+    # ================================================================
 
-    return render_template('detail_page.html', house=house, facilities=facilities_list, recommend_li=recommend_li)
-
+    # f. 最后，把 is_collected 这个状态变量传递给前端模板
+    return render_template('detail_page.html', 
+                           house=house, 
+                           facilities=facilities_list, 
+                           recommend_li=recommend_li,
+                           is_collected=is_collected)
 # 处理交通有无的情况
 def deal_none(word):
     if len(word) == 0 or word is None:

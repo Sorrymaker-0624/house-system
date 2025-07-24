@@ -390,9 +390,17 @@
                                 <!-- 价格 -->
                                 <div class="house-info">
                                     <span class="price">￥&nbsp;{{ house.price }}/月</span>
-                                    <span class="collection" id="btn-collection"><a>
-                                            <i class="fa fa-heart" aria-hidden="true">收藏</i></a></span>
+                                    <span class="collection" id="btn-collection">
+                                        <a>
+                                            {% if is_collected %}
+                                            <i class="fa fa-heart" aria-hidden="true" style="color: #e74c3c;"> 已收藏</i>
+                                            {% else %}
+                                            <i class="fa fa-heart" aria-hidden="true"> 收藏</i>
+                                            {% endif %}
+                                        </a>
+                                    </span>
                                 </div>
+
 
                                 <!-- 基本信息标题 -->
                                 <div class="attribute-header">
@@ -565,7 +573,8 @@
                                                     <div class="recommend-info1">
                                                         <span>{{ house.rooms }} - {{ house.area}}平方米</span>
                                                         <span class="price float-right"
-                                                            style="color: #e74c3c;">￥&nbsp;{{ house.price }}</span>
+                                                            style="color: #e74c3c;">￥&nbsp;{{
+                                                            house.price }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -790,20 +799,38 @@
             });
             //点击收藏
             $("#btn-collection").on("click", function () {
-                $.ajax({
-                    url: '/get/collection/{{ house.id }}',
-                    type: 'get',
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data['valid'] == '0') {
-                            alert(data['msg'])
-                        } else {
-                            alert(data['msg'])
+                // "this" 指向被点击的 <span id="btn-collection">
+                var button = $(this);
+                var houseId = {{ house.id }};
+
+
+            $.ajax({
+                url: '/collect/' + houseId,
+                type: 'POST',
+                dataType: 'json',
+                success: function (resp) {
+                    if (resp.valid === '1') {
+                        // 在 <span> 中找到 <i> 标签，然后修改它
+                        var icon = button.find('i');
+
+                        if (resp.action === 'added') {
+                            // 添加收藏成功后
+                            icon.text(' 已收藏').css('color', '#e74c3c'); // 文字变“已收藏”，颜色变红
+                        } else if (resp.action === 'removed') {
+                            // 取消收藏成功后
+                            icon.text(' 收藏').css('color', ''); // 文字恢复，颜色恢复默认
                         }
                     }
-                });
+                    // 弹出后端返回的提示信息
+                    alert(resp.msg);
+                },
+                error: function () {
+                    alert('操作失败，请重试！');
+                }
             });
         });
+        });
+
     </script>
 </body>
 
