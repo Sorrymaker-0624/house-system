@@ -369,7 +369,7 @@
                         <div class="row">
                             <div class="col-lg-8 c-1">
                                 <span>住址：</span>
-                                <span class="nkname">{{ user.addr }}</span>
+                                <span class="nkaddr">{{ user.addr }}</span>
                             </div>
                             <div class="col-lg-4">
                                 <button class="btn-info c-2" id="btn-addr">
@@ -382,10 +382,10 @@
                         <div class="row">
                             <div class="col-lg-8 c-1">
                                 <span>密码：</span>
-                                <span class="nkname">{{ user.password }}</span>
+                                <span class="nkpd">******</span>
                             </div>
                             <div class="col-lg-4">
-                                <button class="btn-info c-2" id="btn-password">
+                                <button class="btn-info c-2" id="btn-pd">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true">编辑</i>
                                 </button>
                             </div>
@@ -395,7 +395,7 @@
                         <div class="row">
                             <div class="col-lg-8 c-1">
                                 <span>邮箱：</span>
-                                <span class="nkname">{{ user.email }}</span>
+                                <span class="nkemail">{{ user.email }}</span>
                             </div>
                             <div class="col-lg-4">
                                 <button class="btn-info c-2" id="btn-email">
@@ -558,17 +558,13 @@
                 type: 'POST',
                 dataType: 'json',
                 success: function (resp) {
-                    // 如果后端返回成功，并且操作是“removed”（移除）
                     if (resp.valid === '1' && resp.action === 'removed') {
                         alert(resp.msg); // 弹出“已取消收藏”
 
-                        // 使用 .closest('.collection-line') 找到按钮所在的整个房源信息行
-                        // 然后用一个平滑的动画效果将它移除
                         button.closest('.collection-line').fadeOut(500, function () {
                             $(this).remove();
                         });
                     } else {
-                        // 如果操作失败（比如用户未登录，后端会返回提示），也弹出消息
                         alert(resp.msg);
                     }
                 },
@@ -614,210 +610,168 @@
         //修改用户昵称
 
         //标志位
+        //修改用户昵称
         var name_option = 1;
-        //获取原来的名字
-        var y_name = $('#n-data').val();
         $("#btn-name").on('click', function () {
-            if (name_option == 1) {
-                $('.nkname').html('<input id="nkname" type="text" required placeholder="6-15位字母或数字">');
+            var y_name = $('#n-data').val();
+            if(name_option == 1) {
+                $('.nkname').html('<input id="nkname" type="text" value="' + y_name + '">');
                 $('#nkname').focus();
                 $("#btn-name i").text('提交');
-                name_option = 0
+                name_option = 0;
             } else {
-                var j_data = {};
                 var v_nkname = $('#nkname').val();
-                if (5 < v_nkname.length < 16) {
-                    if (/[\u4e00-\u9fa5|a-zA-Z0-9]+$/.test(v_nkname)) {
-                        j_data['name'] = v_nkname;
-                        j_data['y_name'] = y_name
-                    } else {
-                        alert('用户名需要6-15位字母或数字')
-                        $('.nkname').html('<input id="nkname" type="text" required placeholder="6-15位字母或数字">');
-                        $('#nkname').focus();
-                        return
-                    }
-                }
-
                 $.ajax({
-                    url: "http://127.0.0.1:5000/modify/userinfo/name",
+                    url: "/modify/userinfo/name",
                     type: 'post',
                     dataType: 'json',
-                    data: j_data,
+                    data: { name: v_nkname, y_name: y_name },
                     success: function (data) {
-                        if (data['ok'] == '1') {
-                            alert('修改成功');
-                            name_option = 1;
-                            $('.nkname').html(v_nkname);
-                            $('#btn-name i').text('编辑');
-                            $('#n-data').attr('value', v_nkname);
-                            window.location.href = '/user/' + v_nkname
+                        if (data.ok == '1') {
+                            alert('修改成功，将重新加载页面');
+                            // 成功后因为页面会跳转，按钮状态会自动重置
+                            window.location.href = '/user/' + v_nkname;
                         } else {
-                            alert('修改失败，请重试~');
-                            $('#nkname').html(y_name);
-                            $('#btn-name i').text('编辑');
+                            alert(data.msg || '修改失败，请重试~');
+                            // 失败时恢复原状
+                            $('.nkname').html(y_name);
+                            $("#btn-name i").text('编辑');
+                            name_option = 1;
                         }
                     },
-                    error: function () {
+                    error: function() {
                         alert('修改失败，请重试~');
-                        $('#nkname').html(y_name);
-                        $('#btn-name i').text('编辑');
+                        $('.nkname').html(y_name);
+                        $("#btn-name i").text('编辑');
+                        name_option = 1;
                     }
                 });
             }
         });
 
+        //修改用户住址
         var addr_option = 1;
-        var y_name = $('#n-data').val();
-        var y_addr = $('#a-data').val();
         $("#btn-addr").on('click', function () {
+            var y_name = $('#n-data').val();
+            var y_addr = $('#a-data').val() || ""; // 处理None的情况
             if (addr_option == 1) {
-                $('.nkaddr').html('<input id="nkaddr" type="text" required placeholder="6-15位中文、字母或数字">');
+                $('.nkaddr').html('<input id="nkaddr" type="text" value="' + y_addr + '">');
                 $('#nkaddr').focus();
                 $("#btn-addr i").text('提交');
-                addr_option = 0
+                addr_option = 0;
             } else {
-                var j_data = {};
                 var v_nkaddr = $('#nkaddr').val();
-                if (5 < v_nkaddr.length < 16) {
-                    if (/[\u4e00-\u9fa5|a-zA-Z0-9]+$/.test(v_nkaddr)) {
-                        j_data['name'] = v_nkaddr;
-                        j_data['y_name'] = y_name
-                    } else {
-                        alert('用户名需要6-15位字母或数字')
-                        $('.nkaddr').html('<input id="nkaddr" type="text" required placeholder="6-15位字母或数字">');
-                        $('#nkaddr').focus();
-                        return
-                    }
-                }
-
                 $.ajax({
-                    url: "http://127.0.0.1:5000/modify/userinfo/addr",
+                    url: "/modify/userinfo/addr",
                     type: 'post',
                     dataType: 'json',
-                    data: j_data,
+                    data: { addr: v_nkaddr, y_name: y_name },
                     success: function (data) {
-                        if (data['ok'] == '1') {
+                        if (data.ok == '1') { 
                             alert('修改成功');
                             addr_option = 1;
                             $('.nkaddr').html(v_nkaddr);
                             $('#btn-addr i').text('编辑');
                             $('#a-data').attr('value', v_nkaddr);
                         } else {
-                            alert('修改失败，请重试~');
-                            $('#nkaddr').html(y_addr);
+                            alert(data.msg || '修改失败，请重试~');
+                            $('.nkaddr').html(y_addr);
                             $('#btn-addr i').text('编辑');
+                            addr_option = 1;
                         }
                     },
-                    error: function () {
+                    error: function() {
                         alert('修改失败，请重试~');
-                        $('#nkaddr').html(y_addr);
-                        $('#btn-addr i').text('编辑');
+                        $('.nkaddr').html(y_addr);
+                        $("#btn-addr i").text('编辑');
+                        addr_option = 1;
                     }
                 });
             }
         });
-
+        
+        //修改密码
         var pd_option = 1;
-        var y_name = $('#n-data').val();
-        var y_pd = $('#p-data').val();
-        $("#btn-password").on('click', function () {
+        $("#btn-pd").on('click', function () {
+            var y_name = $('#n-data').val();
             if (pd_option == 1) {
-                $('.nkpd').html('<input id="nkpd" type="text" required placeholder="6-15位中文、字母或数字">');
+                $('.nkpd').html('<input id="nkpd" type="password" placeholder="请输入新密码">');
                 $('#nkpd').focus();
                 $("#btn-pd i").text('提交');
-                pd_option = 0
+                pd_option = 0;
             } else {
-                var j_data = {};
                 var v_nkpd = $('#nkpd').val();
-                if (5 < v_nkpd.length < 16) {
-                    if (/[a-zA-Z0-9]+$/.test(v_nkpd)) {
-                        j_data['pd'] = v_nkpd;
-                        j_data['y_name'] = y_name
-                    } else {
-                        alert('用户名需要6-15位字母或数字')
-                        $('.nkpd').html('<input id="nkpd" type="text" required placeholder="6-15位字母或数字">');
-                        $('#nkpd').focus();
-                        return
-                    }
-                }
-
                 $.ajax({
-                    url: "http://127.0.0.1:5000/modify/userinfo/pd",
+                    url: "/modify/userinfo/pd",
                     type: 'post',
                     dataType: 'json',
-                    data: j_data,
+                    data: { pd: v_nkpd, y_name: y_name },
                     success: function (data) {
-                        if (data['ok']) {
+                        if (data.ok == '1') { 
                             alert('修改成功');
                             pd_option = 1;
-                            $('.nkpd').html(v_nkpd);
+                            $('.nkpd').html('******'); 
                             $('#btn-pd i').text('编辑');
                             $('#p-data').attr('value', v_nkpd);
                         } else {
-                            alert('修改失败，请重试~');
-                            $('#nkpd').html(y_pd);
-                            $('#btn-pd i').text('编辑');
+                            alert(data.msg || '修改失败，请重试~');
+                            $('.nkpd').html('******');
+                            $('#btn-pd i').text('编辑'); 
+                            pd_option = 1;
                         }
                     },
-                    error: function () {
+                    error: function() {
                         alert('修改失败，请重试~');
-                        $('#nkpd').html(y_pd);
-                        $('#btn-pd i').text('编辑');
+                        $('.nkpd').html('******');
+                        $("#btn-pd i").text('编辑');
+                        pd_option = 1;
                     }
                 });
             }
         });
 
+        //修改邮箱
         var email_option = 1;
-        var y_name = $('#n-data').val();
-        var y_email = $('#e-data').val();
         $("#btn-email").on('click', function () {
+            var y_name = $('#n-data').val();
+            var y_email = $('#e-data').val();
             if (email_option == 1) {
-                $('.nkemail').html('<input id="nkemail" type="text" required placeholder="邮箱格式错误！">');
+                $('.nkemail').html('<input id="nkemail" type="text" value="' + y_email + '">');
                 $('#nkemail').focus();
                 $("#btn-email i").text('提交');
-                email_option = 0
+                email_option = 0;
             } else {
-                var j_data = {};
                 var v_nkemail = $('#nkemail').val();
-                if (5 < v_nkemail.length < 16) {
-                    if (/^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/.test(v_nkemail)) {
-                        j_data['email'] = v_nkemail;
-                        j_data['y_name'] = y_name
-                    } else {
-                        alert('邮箱格式错误！')
-                        $('.nkemail').html('<input id="nkemail" type="text" required placeholder="邮箱格式错误！">');
-                        $('#nkemail').focus();
-                        return
-                    }
-                }
-
                 $.ajax({
-                    url: "http://127.0.0.1:5000/modify/userinfo/email",
+                    url: "/modify/userinfo/email",
                     type: 'post',
                     dataType: 'json',
-                    data: j_data,
+                    data: { email: v_nkemail, y_name: y_name },
                     success: function (data) {
-                        if (data['ok']) {
+                        if (data.ok == '1') { 
                             alert('修改成功');
                             email_option = 1;
                             $('.nkemail').html(v_nkemail);
                             $('#btn-email i').text('编辑');
                             $('#e-data').attr('value', v_nkemail);
                         } else {
-                            alert('修改失败，请重试~');
-                            $('#nkemail').html(y_email);
+                            alert(data.msg || '修改失败，请重试~');
+                            $('.nkemail').html(y_email);
                             $('#btn-email i').text('编辑');
+                            email_option = 1;
                         }
                     },
-                    error: function () {
+                    error: function() {
                         alert('修改失败，请重试~');
-                        $('#nkemail').html(y_email);
-                        $('#btn-email i').text('编辑');
+                        $('.nkemail').html(y_email);
+                        $("#btn-email i").text('编辑');
+                        email_option = 1;
                     }
                 });
             }
         });
+    
+
 
     </script>
 </body>

@@ -22,12 +22,11 @@ def toggle_collection(house_id):
     if not house:
         return jsonify({'valid': '0', 'msg': '操作的房源不存在'})
 
-    # 3. 获取用户当前的收藏列表
-    #    - 如果 user.collect_id 存在且不为空，则按','分割成列表
-    #    - 否则，创建一个空列表
+    #  获取用户当前的收藏列表
+
     collect_ids = user.collect_id.split(',') if user.collect_id and user.collect_id != '' else []
     
-    # 4. 判断是“收藏”还是“取消收藏”
+    #  判断是“收藏”还是“取消收藏”
     str_house_id = str(house_id) # ID在列表中是以字符串形式存在的，需要转换
 
     if str_house_id in collect_ids:
@@ -41,11 +40,11 @@ def toggle_collection(house_id):
         action = 'added'
         msg = '收藏成功'
     
-    # 5. 将更新后的列表重新拼接成字符串，并保存回数据库
+    #  将更新后的列表重新拼接成字符串，并保存回数据库
     try:
         user.collect_id = ','.join(collect_ids)
         db.session.commit()
-        # 6. 返回成功的响应，并告诉前端具体执行了什么操作（'action'字段）
+        #  返回成功的响应，并告诉前端具体执行了什么操作（'action'字段）
         return jsonify({'valid': '1', 'msg': msg, 'action': action})
     except Exception as e:
         db.session.rollback() # 如果出错，回滚数据库操作

@@ -16,10 +16,12 @@ from page.detail import detail_page
 from api.detail import detail_api
 # 用户中心页面
 from page.user import user_page
-
+# 浏览记录
 from api.history_api import history_api 
-
+# 收藏
 from api.collection_api import collection_api
+# 编辑
+from api.userinfo import userinfo_api
 app =Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
@@ -46,9 +48,11 @@ app.register_blueprint(user_page, url_prefix='/')
 app.register_blueprint(detail_api, url_prefix='/get/')
 # 注册用户登录与注册接口
 app.register_blueprint(user_api, url_prefix='/')
-
+# 浏览记录接口
 app.register_blueprint(history_api, url_prefix='/')
-
+# 收藏接口
 app.register_blueprint(collection_api, url_prefix='/')
+# 编辑接口
+app.register_blueprint(userinfo_api,url_prefix='/modify/userinfo')
 if __name__ == '__main__':
     app.run(debug=True)

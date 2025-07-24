@@ -18,12 +18,6 @@ def user(username):
             if valid_ids:
                 collect_house_list = House.query.filter(House.id.in_(valid_ids)).all()
 
-        # ================================================================
-        # ▼▼▼▼▼▼▼▼▼▼ 【关键修改】更新查询浏览记录的逻辑 ▼▼▼▼▼▼▼▼▼▼
-        # ================================================================
-        
-        # 使用JOIN查询，将Recommend表和House表连接起来
-        # 这样可以直接获取到完整的House对象，并且还能按浏览次数(score)排序
         seen_house_list = db.session.query(House).join(
             Recommend, House.id == Recommend.house_id
         ).filter(
@@ -32,16 +26,11 @@ def user(username):
             Recommend.score.desc()
         ).limit(10).all()
 
-        # =======================================================
-        # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-        # =======================================================
-        
-        # --- 将所有查询到的数据传递给模板 ---
         return render_template(
             'user_page.html', 
             user=user, 
             collect_house_list=collect_house_list,
-            seen_house_list=seen_house_list # 现在这里面是完整的House对象了
+            seen_house_list=seen_house_list
         )
 
     else:

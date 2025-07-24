@@ -1,5 +1,3 @@
-# 文件: api/history_api.py
-
 from flask import Blueprint, request, jsonify
 from models import User, Recommend # Recommend模型是浏览记录
 from config import db

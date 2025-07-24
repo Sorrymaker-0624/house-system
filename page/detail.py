@@ -22,7 +22,7 @@ def detail(hid):
     else:
         recommend_li = recommend_data
     is_collected = False    
-    user_name = request.cookies.get('name') # b. 获取当前登录的用户名
+    user_name = request.cookies.get('name') # 获取当前登录的用户名
     
     if user_name:
         user = User.query.filter_by(name=user_name).first()
@@ -33,14 +33,14 @@ def detail(hid):
     
    
     if user_name: # 同样，只有在用户登录时才记录
-        # a. 查找是否已有这条用户对这个房源的浏览记录
+        #查找是否已有这条用户对这个房源的浏览记录
         record = Recommend.query.filter_by(user_id=user.id, house_id=hid).first()
         
         if record:
-            # b. 如果记录已存在，说明是重复访问，将分数(score)+1
+            # 如果记录已存在，说明是重复访问，将分数(score)+1
             record.score += 1
         else:
-            # c. 如果记录不存在，就创建一条新记录
+            #  如果记录不存在，就创建一条新记录
             record = Recommend(
                 user_id=user.id,
                 house_id=hid,
@@ -49,7 +49,7 @@ def detail(hid):
                 block=house.block,
                 score=1 # 首次访问，分数为1
             )
-        # d. 将修改或新增的记录提交到数据库
+
         db.session.add(record)
         db.session.commit()
     # 最后，把 is_collected 这个状态变量传递给前端模板
